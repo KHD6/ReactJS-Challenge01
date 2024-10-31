@@ -262,7 +262,7 @@ function Coin({ isDarkMode, toggleDarkMode, setIsDarkMode}: IDarkMode) {
 
           <Switch>
             <Route path={`/ReactJS-Challenge01/:coinId/price`}>
-              <Price />
+              <Price coinId={coinId} USDPrice={tickersData?.quotes.USD.price}/>
             </Route>
             <Route path={`/ReactJS-Challenge01/:coinId/chart`}>
               <Chart coinId={coinId} />
