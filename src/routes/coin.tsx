@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import {
   Link,
   Route,
@@ -12,6 +13,7 @@ import Price from "./Price";
 import Chart from "./Chart";
 import { useQuery } from "react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
+import ToggleBtn from "../component/toggleBtn";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -24,6 +26,7 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 `;
 
 const Title = styled.h1`
@@ -74,6 +77,22 @@ const Tab = styled.span<{ isActive: boolean }>`
   border-radius: 10px;
   color: ${(props) =>
     props.isActive ? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
+  &:hover {
+    color: ${(props) => props.theme.accentColor};
+  }
+`;
+
+const Home = styled.div`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
   a {
     display: block;
   }
@@ -144,11 +163,17 @@ interface PriceData {
   };
 }
 
-function Coin() {
+interface IDarkMode {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+  setIsDarkMode: any;
+}
+
+function Coin({ isDarkMode, toggleDarkMode, setIsDarkMode}: IDarkMode) {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
-  const priceMatch = useRouteMatch("/:coinId/price");
-  const chartMatch = useRouteMatch("/:coinId/chart");
+  const priceMatch = useRouteMatch("/ReactJS-Challenge01/:coinId/price");
+  const chartMatch = useRouteMatch("/ReactJS-Challenge01/:coinId/chart");
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["info", coinId],
     () => fetchCoinInfo(coinId)
@@ -156,6 +181,9 @@ function Coin() {
   const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
     ["tickers", coinId],
     () => fetchCoinTickers(coinId)
+    // {
+    //   refetchInterval: 10000,
+    // }
   );
   const loading = infoLoading || tickersLoading;
   // const [loading, setLoading] = useState(true);
@@ -174,10 +202,21 @@ function Coin() {
   //     setLoading(false);
   //   })();
   // }, [coinId]);
-
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </title>
+        <link
+          rel="icon"
+          type="image/png"
+          href={`https://static.coinpaprika.com/coin/${coinId.toLowerCase()}/logo.png`}
+          key="custom-icon"
+        />
+      </Helmet>
       <Header>
+        <ToggleBtn isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} setIsDarkMode={setIsDarkMode}/>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
@@ -196,8 +235,8 @@ function Coin() {
               <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? "Yes" : "No"}</span>
+              <span>Price:</span>
+              <span>{tickersData?.quotes.USD.price}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
@@ -214,21 +253,25 @@ function Coin() {
 
           <Tabs>
             <Tab isActive={chartMatch !== null}>
-              <Link to={`/${coinId}/chart`}>Chart</Link>
+              <Link to={`/ReactJS-Challenge01/${coinId}/chart`}>Chart</Link>
             </Tab>
             <Tab isActive={priceMatch !== null}>
-              <Link to={`/${coinId}/price`}>Price</Link>
+              <Link to={`/ReactJS-Challenge01/${coinId}/price`}>Price</Link>
             </Tab>
           </Tabs>
 
           <Switch>
-            <Route path={`/:coinId/price`}>
+            <Route path={`/ReactJS-Challenge01/:coinId/price`}>
               <Price />
             </Route>
-            <Route path={`/:coinId/chart`}>
+            <Route path={`/ReactJS-Challenge01/:coinId/chart`}>
               <Chart coinId={coinId} />
             </Route>
           </Switch>
+
+          <Home>
+            <Link to={`/ReactJS-Challenge01/`}>HOME</Link>
+          </Home>
         </>
       )}
     </Container>

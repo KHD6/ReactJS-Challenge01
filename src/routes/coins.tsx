@@ -3,6 +3,8 @@ import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoins } from "../api";
+import { Helmet } from "react-helmet";
+import ToggleBtn from "../component/toggleBtn";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -15,6 +17,7 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 `;
 
 const CoinsList = styled.ul``;
@@ -63,8 +66,14 @@ interface Icoin {
   type: string;
 }
 
-function Coins() {
-  const { isLoading, data} = useQuery<Icoin[]>("allCoins", fetchCoins)
+interface IDarkMode {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+  setIsDarkMode: any;
+}
+
+function Coins({ isDarkMode, toggleDarkMode, setIsDarkMode}: IDarkMode) {
+  const { isLoading, data } = useQuery<Icoin[]>("allCoins", fetchCoins);
   // const [coins, setCoins] = useState<Icoin[]>([]);
   // const [loading, setLoading] = useState(true);
 
@@ -79,8 +88,12 @@ function Coins() {
 
   return (
     <Container>
+      <Helmet>
+        <title>Coin List</title>
+      </Helmet>
       <Header>
-        <Title>코인</Title>
+      <ToggleBtn isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} setIsDarkMode={setIsDarkMode}/>
+        <Title>Coin List</Title>
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>
@@ -90,8 +103,8 @@ function Coins() {
             <Coin key={coin.id}>
               <Link
                 to={{
-                  pathname: `/${coin.id}`,
-                  state: { name: coin.name},
+                  pathname: `/ReactJS-Challenge01/${coin.id}`,
+                  state: { name: coin.name },
                 }}
               >
                 <Img

@@ -1,13 +1,16 @@
 import { useState } from "react";
 import Router from "./router";
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { ReactQueryDevtools } from "react-query/devtools";
-
+import { darkTheme, lightTheme } from "./theme";
 
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 html{font-size: 10px;}
-body{text-align: left;font-size:1.6rem;color:${(props) => props.theme.textColor};background-color: ${(props) => props.theme.bgColor};line-height:1.4;font-weight:400; font-family: "Noto Sans", sans-serif;}
+body{text-align: left;font-size:1.6rem;color:${(props) =>
+  props.theme.textColor};background-color: ${(props) =>
+  props.theme
+    .bgColor};line-height:1.4;font-weight:400; font-family: "Noto Sans", sans-serif;}
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,span,form,fieldset,p,button,address,table, tbody, tfoot, thead, th, tr, td, video {margin:0;padding:0;box-sizing: border-box;}
 header,article,aside,canvas,details,figcaption,figure,footer,hgroup,menu,nav,section,summary,mark {display:block;margin: 0; padding: 0;box-sizing: border-box;}
 h1,h2,h3,h4,h5,h6{box-sizing: border-box;}
@@ -42,11 +45,20 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor: pointer;}
 `;
 
 function App() {
-  return <>
-  <GlobalStyle />
-  <Router />
-  <ReactQueryDevtools initialIsOpen={true} />
-  </>;
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
+  };
+  return (
+    <>
+      <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+        <GlobalStyle />
+        <Router isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} setIsDarkMode={setIsDarkMode}/>
+        <ReactQueryDevtools initialIsOpen={true} />
+      </ThemeProvider>
+    </>
+  );
 }
 
 export default App;
